@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -17,6 +18,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private PhotonCamera camera;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -28,6 +30,12 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
   }
 
+  @Override
+  public void robotInit(){
+    camera = new PhotonCamera("Black and White Cam 1");
+  }
+  
+  
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
@@ -68,7 +76,28 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    double forward = -m_robotContainer.m_driverController.getLeftY();
+    double strafe = -m_robotContainer.m_driverController.getLeftX();
+    double turn = -m_robotContainer.m_driverController.getRightX();
+    boolean targetVisible = false;
+    double targetYaw = 0.0;
+    var results = camera.getAllUnreadResults();
+    if(!results.isEmpty()){
+      var result = results.get(results.size() - 1);
+      if(result.hasTargets()){
+        for(var target : result.getTargets()){
+          if(target.getFiducialId() == 7){
+            targetYaw = target.getYaw();
+          }
+        }
+      }
+    }
+    if(m_robotContainer.m_driverController.a().getAsBoolean() && targetVisible){
+      turn = -1.0 * targetYaw;
+    }
+    //m_robotContainer.drivebase.driveCommand(forward, strafe, turn, );
+  }
 
   @Override
   public void testInit() {
