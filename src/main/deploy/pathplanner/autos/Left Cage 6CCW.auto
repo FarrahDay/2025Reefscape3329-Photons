@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Cage to Reef 6CCW"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Reef 6 to Left Coral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Coral to Reef 6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Reef 6 to Left Coral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Coral to Reef 6"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
