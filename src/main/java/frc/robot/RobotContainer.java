@@ -7,6 +7,11 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -18,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  private final SendableChooser<Command> autoChooser;
+  
   // The robot's subsystems and commands are defined here...
   public final SwerveSubsystem drivebase = new SwerveSubsystem();
 
@@ -28,8 +35,10 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
-    configureBindings();
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Autonomous Chooser", autoChooser);
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
+    configureBindings();
   }
 
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
@@ -59,5 +68,13 @@ public class RobotContainer {
    */
   private void configureBindings() {
     
+  }
+
+  public void setMotorBrake(boolean brake) {
+    drivebase.setMotorBrake(brake);
+  }
+
+  public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
   }
 }

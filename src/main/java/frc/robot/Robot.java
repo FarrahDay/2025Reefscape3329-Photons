@@ -6,8 +6,11 @@ package frc.robot;
 
 import org.photonvision.PhotonCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.OperatorConstants;
+import swervelib.SwerveInputStream;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -32,7 +35,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit(){
-    camera = new PhotonCamera("Black and White Cam 1");
+    camera = new PhotonCamera("Black and White Cam 1");    
   }
   
   
@@ -59,6 +62,18 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
+  @Override
+  public void autonomousInit()
+  {
+    m_robotContainer.setMotorBrake(true);
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null)
+    {
+      m_autonomousCommand.schedule();
+    }
+  }
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
@@ -76,6 +91,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
+  
   public void teleopPeriodic() {
     double forward = -m_robotContainer.m_driverController.getLeftY();
     double strafe = -m_robotContainer.m_driverController.getLeftX();
@@ -89,14 +105,34 @@ public class Robot extends TimedRobot {
         for(var target : result.getTargets()){
           if(target.getFiducialId() == 7){
             targetYaw = target.getYaw();
+            targetVisible = true;
           }
         }
       }
     }
+
     if(m_robotContainer.m_driverController.a().getAsBoolean() && targetVisible){
-      turn = -1.0 * targetYaw;
+      final double adjustedTurn = -1.0 * targetYaw;
+      turn = adjustedTurn;
     }
-    //m_robotContainer.drivebase.driveCommand(forward, strafe, turn, );
+
+    final double adjustedTurn = turn;
+    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_robotContainer.drivebase.getSwerveDrive(),
+                                  () -> forward,
+                                  () -> strafe)
+                                  .withControllerRotationAxis(() -> -adjustedTurn)
+                                  .deadband(OperatorConstants.DEADBAND)
+                                  .scaleTranslation(0.8)
+                                  .allianceRelativeControl(true);
+
+    m_robotContainer.drivebase.driveFieldOriented(driveAngularVelocity);
+
+    SmartDashboard.putBoolean("Visible", targetVisible);
+    SmartDashboard.putNumber("Turn", turn);
+    SmartDashboard.putNumber("Forward", forward);
+    SmartDashboard.putNumber("Strafe", strafe);
+    SmartDashboard.putNumber("Adjusted Turn", adjustedTurn);
+    SmartDashboard.putNumber("Target Yaw", targetYaw);
   }
 
   @Override
