@@ -19,5 +19,14 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final double DEADBAND = 0.05;
   }
+
+  public static class VisionConstants {
+    public static final double turnP = 0.05;
+    public static final double turnI = 0;
+    public static final double turnD = 0.002;
+    public static final double forwardP = 0.5;
+    public static final double forwardI = 0;
+    public static final double forwardD = 0;
+  }
   public static final double maxSpeed = Units.feetToMeters(4.5);
 }

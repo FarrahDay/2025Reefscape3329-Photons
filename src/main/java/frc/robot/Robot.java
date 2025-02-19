@@ -5,12 +5,14 @@
 package frc.robot;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants.OperatorConstants;
-import swervelib.SwerveInputStream;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -22,117 +24,116 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
   private PhotonCamera camera;
-
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
-  }
-
-  @Override
-  public void robotInit(){
-    camera = new PhotonCamera("Black and White Cam 1");    
-  }
   
-  
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-  }
+    private double forward;
+    private double strafe;
+    private double turn;
+    private boolean targetVisible;
 
-  /** This function is called once each time the robot enters Disabled mode. */
-  @Override
-  public void disabledInit() {}
+    //private static ProfiledPIDController turnPID;
+    private static PIDController turnPID;
+    private static PIDController forwardPID;
 
-  @Override
-  public void disabledPeriodic() {}
+    public Robot() {
+      m_robotContainer = new RobotContainer();
+    }
+      
+    @Override
+    public void robotInit(){
+      camera = new PhotonCamera("Yellow Cam");    
+    }
 
-  @Override
-  public void autonomousInit()
-  {
-    m_robotContainer.setMotorBrake(true);
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    @Override
+    public void robotPeriodic() {
+      CommandScheduler.getInstance().run();
+    }
 
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null)
+    @Override
+    public void disabledInit() {}
+      
+    @Override
+    public void disabledPeriodic() {}
+      
+    @Override
+    public void autonomousInit()
     {
-      m_autonomousCommand.schedule();
-    }
-  }
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {}
-
-  @Override
-  public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
-  }
-
-  /** This function is called periodically during operator control. */
-  @Override
-  
-  public void teleopPeriodic() {
-    double forward = -m_robotContainer.m_driverController.getLeftY();
-    double strafe = -m_robotContainer.m_driverController.getLeftX();
-    double turn = -m_robotContainer.m_driverController.getRightX();
-    boolean targetVisible = false;
-    double targetYaw = 0.0;
-    var results = camera.getAllUnreadResults();
-    if(!results.isEmpty()){
-      var result = results.get(results.size() - 1);
-      if(result.hasTargets()){
-        for(var target : result.getTargets()){
-          if(target.getFiducialId() == 7){
-            targetYaw = target.getYaw();
-            targetVisible = true;
-          }
-        }
+      m_robotContainer.setMotorBrake(true);
+      m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+      if (m_autonomousCommand != null)
+      {
+        m_autonomousCommand.schedule();
       }
     }
 
-    if(m_robotContainer.m_driverController.a().getAsBoolean() && targetVisible){
-      final double adjustedTurn = -1.0 * targetYaw;
-      turn = adjustedTurn;
+    @Override
+    public void autonomousPeriodic() {}
+      
+    @Override
+    public void teleopInit() {
+      double turnTarget = 0;
+      double forwardTarget = 0;
+      turnPID = new PIDController(Constants.VisionConstants.turnP,
+                                  Constants.VisionConstants.turnI,
+                                  Constants.VisionConstants.turnD);
+      forwardPID = new PIDController(Constants.VisionConstants.forwardP,
+                                      Constants.VisionConstants.forwardI, 
+                                      Constants.VisionConstants.forwardD);
+      setTargetTurn(turnTarget);
+      setTargetForward(forwardTarget);
+      if (m_autonomousCommand != null) {
+        m_autonomousCommand.cancel();
+      }
     }
 
-    final double adjustedTurn = turn;
-    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_robotContainer.drivebase.getSwerveDrive(),
-                                  () -> forward,
-                                  () -> strafe)
-                                  .withControllerRotationAxis(() -> -adjustedTurn)
-                                  .deadband(OperatorConstants.DEADBAND)
-                                  .scaleTranslation(0.8)
-                                  .allianceRelativeControl(true);
+    public void setTargetTurn(double target){
+      turnPID.setSetpoint(target);
+    }
 
-    m_robotContainer.drivebase.driveFieldOriented(driveAngularVelocity);
+    public void setTargetForward(double target){
+      forwardPID.setSetpoint(target);
+    }
+  
+    @Override
+    public void teleopPeriodic() {
+      forward = -m_robotContainer.m_driverController.getLeftY();
+      strafe = -m_robotContainer.m_driverController.getLeftX();
+      turn = -m_robotContainer.m_driverController.getRightX();
+      double targetYaw = 0.0;
+      double targetRange = 0.0;
+      var results = camera.getAllUnreadResults();
+      if(!results.isEmpty()){
+        var result = results.get(results.size() - 1);
+        if(result.hasTargets()){
+          for(var target : result.getTargets()){
+            if(target.getFiducialId() == 7){
+              targetYaw = target.getYaw();
+              targetRange = PhotonUtils.calculateDistanceToTargetMeters(0.171, 0.3048, Units.degreesToRadians(20), Units.degreesToRadians(target.getPitch()));
+              targetVisible = true;
+            }
+          }
+        }
+      }
+      else{
+        targetVisible = false;
+      }
+      m_robotContainer.strafe = -this.strafe;
+      SmartDashboard.putNumber("Drive Forward", m_robotContainer.forward);
+      SmartDashboard.putNumber("Drive Strafe", m_robotContainer.strafe);
 
+    if(m_robotContainer.m_driverController.a().getAsBoolean() && targetVisible){
+      //turn = turnPID.calculate(targetYaw);
+      forward = forwardPID.calculate(0.5 - targetRange);
+    }
+
+    m_robotContainer.turn = -this.turn;
+    m_robotContainer.forward = -this.forward;
+    SmartDashboard.putNumber("Drive Turn", m_robotContainer.turn);
     SmartDashboard.putBoolean("Visible", targetVisible);
     SmartDashboard.putNumber("Turn", turn);
     SmartDashboard.putNumber("Forward", forward);
     SmartDashboard.putNumber("Strafe", strafe);
-    SmartDashboard.putNumber("Adjusted Turn", adjustedTurn);
     SmartDashboard.putNumber("Target Yaw", targetYaw);
+    SmartDashboard.putNumber("Target Range", targetRange);
   }
 
   @Override
