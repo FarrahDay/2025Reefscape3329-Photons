@@ -4,7 +4,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,7 +13,6 @@ import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
     ProfiledPIDController pid;
-    ElevatorFeedforward elevatorFeedforward;
     SparkMax left, right;
 
     RelativeEncoder encoder;
@@ -25,6 +23,7 @@ public class Elevator extends SubsystemBase {
         left = new SparkMax(Constants.ElevatorConstants.leftID, MotorType.kBrushless);
         encoder = left.getEncoder();
         encoder.setPosition(0);
+        setTarget(10);
     }
 
     public void run(double speed) {

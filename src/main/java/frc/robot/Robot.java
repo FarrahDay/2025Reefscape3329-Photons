@@ -50,12 +50,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    forward = -m_robotContainer.m_driverController.getLeftY();
-    strafe = -m_robotContainer.m_driverController.getLeftX();
-    turn = -m_robotContainer.m_driverController.getRightX();
-    m_robotContainer.strafe = -this.strafe;
-    m_robotContainer.turn = -this.turn;
-    m_robotContainer.forward = -this.forward;
+    forward = m_robotContainer.m_driverController.getLeftY();
+    strafe = m_robotContainer.m_driverController.getLeftX();
+    turn = m_robotContainer.m_driverController.getRightX();
+    m_robotContainer.strafe = this.strafe;
+    m_robotContainer.turn = this.turn;
+    m_robotContainer.forward = this.forward;
   }
 
   @Override

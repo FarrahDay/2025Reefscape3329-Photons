@@ -19,19 +19,15 @@ public class Algae extends SubsystemBase {
     double target;
 
     public Algae() {
-        pid = new ProfiledPIDController(
-            Constants.AlgaeConstants.kP,
-            Constants.AlgaeConstants.kI,
-            Constants.AlgaeConstants.kD,
-            new Constraints(
-                Constants.AlgaeConstants.maxVelocity,
-                Constants.AlgaeConstants.maxAcceleration
-            )
-        );
+        pid = new ProfiledPIDController(Constants.AlgaeConstants.kP,
+                                        Constants.AlgaeConstants.kI,
+                                        Constants.AlgaeConstants.kD,
+                                        new Constraints(Constants.AlgaeConstants.maxVelocity,
+                                                        Constants.AlgaeConstants.maxAcceleration));
         pivot = new SparkMax(Constants.AlgaeConstants.pivotID, MotorType.kBrushless);
         intake = new SparkMax(Constants.AlgaeConstants.intakeID, MotorType.kBrushed);
         encoder = new DutyCycleEncoder(Constants.AlgaeConstants.encoderID);
-        setTarget(0);
+        setTarget(0.24);
     }
 
     public void runPivot(double speed) {
@@ -72,20 +68,6 @@ public class Algae extends SubsystemBase {
         return this.runEnd(
             () -> this.runIntake(-Constants.AlgaeConstants.ejectSpeed),
             () -> this.runIntake(0)
-        );
-    }
-
-    public Command upAlgaeCommand() {
-        return this.runEnd(
-            () -> this.runPivot(0.1),
-            () -> this.runPivot(0)
-        );
-    }
-
-    public Command downAlgaeCommand() {
-        return this.runEnd(
-            () -> this.runPivot(-0.1),
-            () -> this.runPivot(0)
         );
     }
 

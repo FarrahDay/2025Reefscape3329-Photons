@@ -27,8 +27,8 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-  private final File directory = new File(Filesystem.getDeployDirectory(), "swerve");
-  private SwerveDrive swerveDrive;
+  File directory = new File(Filesystem.getDeployDirectory(), "swerve");
+  SwerveDrive swerveDrive;
 
   public SwerveSubsystem() {
     try {
@@ -57,7 +57,9 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
-    return run(() -> swerveDrive.driveFieldOriented(velocity.get()));
+    return run(() -> {
+      swerveDrive.driveFieldOriented(velocity.get());
+    });
   }
 
   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
@@ -75,7 +77,7 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.setMotorIdleMode(brake);
   }
 
-  private void setupPathPlanner() {
+  public void setupPathPlanner() {
     RobotConfig config;
     try {
       config = RobotConfig.fromGUISettings();

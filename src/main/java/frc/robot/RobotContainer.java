@@ -1,12 +1,12 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.Algae;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.Configs.*;
+import frc.robot.subsystems.*;
 import swervelib.SwerveInputStream;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,6 +17,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   public final SwerveSubsystem drivebase = new SwerveSubsystem();
   private Elevator m_Elevator = new Elevator();
+  private Coral m_Coral = new Coral();
   private Algae m_Algae = new Algae();
   public final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
   public final CommandXboxController m_operatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);
@@ -39,22 +40,19 @@ public class RobotContainer {
   Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
 
   private void configureBindings() {
-    // algae controls
-    // to change positions, while disabled adjust the algae the angle you want and observe the current position
-    m_operatorController.a().onTrue(m_Elevator.moveElevatorCommand(5));
-    m_operatorController.b().onTrue(m_Elevator.moveElevatorCommand(10));
-    m_operatorController.x().onTrue(m_Elevator.moveElevatorCommand(15));
-    m_operatorController.y().onTrue(m_Elevator.moveElevatorCommand(20));
-    // intake and eject controls
-    // don't mess with
-    m_operatorController.leftBumper().onTrue(m_Algae.intakeAlgaeCommand());
-    m_operatorController.rightBumper().onTrue(m_Algae.ejectAlgaeCommand());
-    // elevator controls
-    // to change positions, while disabled adjust the elevator to the height you want and observe the current position
-    m_operatorController.povUp().onTrue(m_Algae.moveAlgaeCommand(0.1));
-    m_operatorController.povRight().onTrue(m_Algae.moveAlgaeCommand(0.2));
-    m_operatorController.povLeft().onTrue(m_Algae.moveAlgaeCommand(0.25));
-    m_operatorController.povDown().onTrue(m_Algae.moveAlgaeCommand(0));
+    m_operatorController.povLeft().onTrue(new L1Config(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.povDown().onTrue(new L2Config(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.povUp().onTrue(new L3Config(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.povRight().onTrue(new L4Config(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.a().onTrue(new CSConfig(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.leftBumper().whileTrue(m_Coral.intakeCoralCommand());
+    m_operatorController.rightBumper().whileTrue(m_Coral.ejectCoralCommand());
+
+    m_operatorController.b().onTrue(new A1Config(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.y().onTrue(new A2Config(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.x().onTrue(new PConfig(m_Elevator, m_Coral, m_Algae));
+    m_operatorController.leftTrigger().whileTrue(m_Algae.intakeAlgaeCommand());
+    m_operatorController.rightTrigger().whileTrue(m_Algae.ejectAlgaeCommand());
   }
 
   public void setMotorBrake(boolean brake) {
