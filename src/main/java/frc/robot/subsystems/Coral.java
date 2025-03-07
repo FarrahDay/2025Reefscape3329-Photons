@@ -26,7 +26,7 @@ public class Coral extends SubsystemBase{
         pivot = new SparkMax(Constants.CoralConstants.pivotID, MotorType.kBrushless);
         intake = new SparkMax(Constants.CoralConstants.intakeID, MotorType.kBrushless);
         encoder = new DutyCycleEncoder(Constants.CoralConstants.encoderID);
-        setTarget(0.05);
+        setTarget(0.25);
     }
 
     public void runPivot(double speed){
@@ -47,7 +47,7 @@ public class Coral extends SubsystemBase{
     }
 
     public Command moveCoralCommand(double degrees){
-        return Commands.runOnce(() -> this.setTarget(degrees)).andThen(Commands.waitSeconds(1.2))
+        return Commands.runOnce(() -> this.setTarget(degrees)).andThen(Commands.waitSeconds(0.5))
                                 .until(() -> isAtPosition());
     }
 
@@ -56,7 +56,7 @@ public class Coral extends SubsystemBase{
     }
     
     public Command intakeCoralCommand(){
-        return this.runEnd(() -> this.runIntake(Constants.CoralConstants.intakeSpeed), () -> this.runIntake(0));
+        return this.runEnd(() -> this.runIntake(Constants.CoralConstants.intakeSpeed), () -> this.runIntake(0.1));
     }
 
     public Command ejectCoralCommand(){

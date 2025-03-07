@@ -4,7 +4,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -12,9 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
-    ProfiledPIDController pid;
     SparkMax left, right;
-
     RelativeEncoder encoder;
     double target;
 
@@ -23,7 +20,7 @@ public class Elevator extends SubsystemBase {
         left = new SparkMax(Constants.ElevatorConstants.leftID, MotorType.kBrushless);
         encoder = left.getEncoder();
         encoder.setPosition(0);
-        setTarget(10);
+        setTarget(0);
     }
 
     public void run(double speed) {
@@ -40,7 +37,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean isAtPosition() {
-        return getEncoderPosition() < target + 1 && getEncoderPosition() > target - 1;
+        return getEncoderPosition() < target + 0.5 && getEncoderPosition() > target - 0.5;
     }
 
     public Command moveElevatorCommand(double degrees) {
@@ -52,9 +49,9 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
         if (!isAtPosition() && getEncoderPosition() < target) {
-            run(0.8);
+            run(0.2);
         } else if (!isAtPosition() && getEncoderPosition() > target) {
-            run(-0.6);
+            run(-0.15);
         } else {
             run(0.05);
         }
