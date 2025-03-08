@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "Alliance Cage Move"
+            "waitTime": 1.0
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Alliance Cage",
+  "folder": null,
   "choreoAuto": false
 }

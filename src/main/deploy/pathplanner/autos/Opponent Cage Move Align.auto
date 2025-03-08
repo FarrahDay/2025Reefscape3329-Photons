@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Alliance Cage Move"
+            "pathName": "Opponent Cage to Off-Line"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Alliance Cage",
+  "folder": "Opponent Cage",
   "choreoAuto": false
 }

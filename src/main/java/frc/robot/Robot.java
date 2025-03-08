@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -46,6 +47,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    CameraServer.startAutomaticCapture();
   }
 
   @Override
@@ -53,9 +55,9 @@ public class Robot extends TimedRobot {
     forward = m_robotContainer.m_driverController.getLeftY();
     strafe = m_robotContainer.m_driverController.getLeftX();
     turn = m_robotContainer.m_driverController.getRightX();
+    m_robotContainer.forward = this.forward;
     m_robotContainer.strafe = this.strafe;
     m_robotContainer.turn = this.turn;
-    m_robotContainer.forward = this.forward;
   }
 
   @Override

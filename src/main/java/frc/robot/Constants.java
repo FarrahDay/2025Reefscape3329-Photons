@@ -14,14 +14,15 @@ public final class Constants {
     public static final int leftID = 14;
     public static final double maxVelocity = 0.3;
     public static final double maxAcceleration = 0.3;
-    public static final double L1 = 2.571;
-    public static final double L2 = 11.786;
-    public static final double L3 = 25.166;
-    public static final double L4 = 42.85;
+    public static final double L1 = 3.5;
+    public static final double L2 = 12.7;
+    public static final double L3 = 26.1;
+    public static final double L4 = 43.05;
     public static final double A1 = 24.261;
     public static final double A2 = 37.404;
     public static final double P = 5.881;
-    public static final double CS = 8.285;
+    public static final double CS = 9.5
+    ;
   }
 
   public static class CoralConstants {
@@ -40,7 +41,7 @@ public final class Constants {
     public static final double L1 = 0.158;
     public static final double L2 = 0;
     public static final double L3 = 0;
-    public static final double L4 = 0.046;
+    public static final double L4 = 0.115;
     public static final double A1 = 0.25;
     public static final double A2 = 0.25;
     public static final double P = 0.25;
@@ -51,7 +52,7 @@ public final class Constants {
     public static final int pivotID = 17;
     public static final int intakeID = 18;
     public static final int encoderID = 1;
-    public static final double intakeSpeed = 2;
+    public static final double intakeSpeed = 4;
     public static final double ejectSpeed = 0.8;
     public static final double kP = 6;
     public static final double kI = 0;
@@ -70,5 +71,5 @@ public final class Constants {
 
 
   
-  public static final double maxSpeed = Units.feetToMeters(7);
+  public static final double maxSpeed = Units.feetToMeters(10);
 }

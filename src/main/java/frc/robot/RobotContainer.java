@@ -7,6 +7,7 @@ import swervelib.SwerveInputStream;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,6 +25,7 @@ public class RobotContainer {
   public double forward = 0;
   public double strafe = 0;
   public double turn = 0;
+  public PathPlannerAuto stay = new PathPlannerAuto("Stay");
 
   public RobotContainer() {
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -38,6 +40,7 @@ public class RobotContainer {
     setMotorBrake(true);
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     configureBindings();
+    autoChooser.setDefaultOption("None", stay);
   }
 
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(), () -> forward, () -> strafe)
@@ -60,6 +63,8 @@ public class RobotContainer {
     m_operatorController.x().onTrue(new PConfig(m_Elevator, m_Coral, m_Algae));
     m_operatorController.leftTrigger().whileTrue(m_Algae.intakeAlgaeCommand());
     m_operatorController.rightTrigger().whileTrue(m_Algae.ejectAlgaeCommand());
+
+    m_driverController.x().onTrue(drivebase.zeroGyro());
   }
 
   public void setMotorBrake(boolean brake) {
