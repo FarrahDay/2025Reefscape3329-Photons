@@ -26,5 +26,11 @@ pluginManagement {
     }
 }
 
+include 'photon-targeting'
+include 'photon-core'
+include 'photon-server'
+include 'photon-lib'
+include 'photon-docs'
+
 Properties props = System.getProperties();
 props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
